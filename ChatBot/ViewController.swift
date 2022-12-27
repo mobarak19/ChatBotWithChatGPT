@@ -9,8 +9,6 @@ import UIKit
 
 class ViewController: UIViewController,UITextFieldDelegate,UITableViewDelegate,UITableViewDataSource {
 
-    
-
     private let field:UITextField = {
         let field = UITextField()
         field.translatesAutoresizingMaskIntoConstraints = false
@@ -33,7 +31,12 @@ class ViewController: UIViewController,UITextFieldDelegate,UITableViewDelegate,U
     
     @IBOutlet weak var imgIcon: UIImageView!
     
+    @IBOutlet weak var containerView: UIView!
+    
+    @IBOutlet weak var backgournd: UIView!
+    
     private var models :[String] = []
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -76,12 +79,39 @@ class ViewController: UIViewController,UITextFieldDelegate,UITableViewDelegate,U
         table.isHidden = true
 
         imgIcon.loadPng(name: "08")
+        containerView.layer.borderWidth = 1
+        containerView.layer.borderColor = UIColor.red.cgColor
         
+        let panGesture = UIPanGestureRecognizer(target: self, action: #selector(onChangeDrage))
+        containerView.addGestureRecognizer(panGesture)
+        //imgIcon.mask = backgournd
+        backgournd.clipsToBounds = true
     }
     @objc func onTap(){
         view.endEditing(true)
     }
 
+    @objc func onChangeDrage(_ sender:UIPanGestureRecognizer){
+        let translation = sender.translation(in: self.view)
+        containerView.center = CGPoint(x: containerView.center.x + translation.x, y: containerView.center.y + translation.y)
+        imgIcon.center = CGPoint(x: imgIcon.center.x + translation.x, y: imgIcon.center.y + translation.y)
+        sender.setTranslation(CGPoint.zero, in: self.view)
+        print("frame",containerView.frame.origin)
+        print("bounds",containerView.bounds.origin)
+
+    }
+    
+    
+    @IBAction func frameSliderChanged(_ sender: UISlider) {
+        containerView.bounds.origin.x = -CGFloat(sender.value*100)
+        print(containerView.frame.origin.y)
+    }
+    
+    @IBAction func boundsSliderChanged(_ sender: UISlider) {
+        containerView.bounds.origin.y = CGFloat(sender.value*100)
+        print(containerView.bounds.origin.y)
+
+    }
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         guard let text = textField.text, !text.isEmpty else{return true}
         APICaller.shared.getResponse(input: text) { [weak self] result in
