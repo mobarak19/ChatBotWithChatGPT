@@ -6,3 +6,18 @@
 //
 
 import Foundation
+
+actor Flight{
+    let company = "Vistara"
+    var availableSeats:[String] = ["1A","1B","1C"]
+
+    func getAvaiableSeats()->[String]{
+            return availableSeats
+        
+    }
+    func bookSeat()->String{
+            let bookSeats = availableSeats.first ?? ""
+            availableSeats.removeFirst()
+            return bookSeats
+    }
+}
